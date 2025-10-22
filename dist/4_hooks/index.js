@@ -1,93 +1,17 @@
-import { F_Collection } from '@liminalfunctions/framework/F_Collection.js';
 import { F_Collection_Registry } from '@liminalfunctions/framework/F_Collection_Registry.js';
 import { F_Security_Model } from '@liminalfunctions/framework/F_Security_Model.js';
-import { F_SM_Open_Access } from '@liminalfunctions/framework/F_SM_Open_Access.js';
 import { v4 as uuid } from 'uuid';
-import { z_mongodb_id } from '@liminalfunctions/framework/index.js';
 import express from 'express';
 import ky from 'ky';
 import mongoose from "mongoose";
-import z from 'zod/v4';
+import { collection_user } from './collection_user.js';
+import { collection_project } from './collection_project.js';
+import { collection_step } from './collection_steps.js';
+import { collection_analytics } from './collection_analytics.js';
 const port = 4601;
 let express_app = express();
 express_app.use(express.json());
 let db_connection = await mongoose.connect('mongodb://127.0.0.1:27018,127.0.0.1:27019,127.0.0.1:27020/deletable_test?replicaSet=local_replica_set');
-let collection_user = new F_Collection('user', 'users', z.object({
-    _id: z_mongodb_id,
-    name: z.string(),
-    auth_system_id: z.string(),
-}));
-let collection_project = new F_Collection('project', 'projects', z.object({
-    _id: z_mongodb_id,
-    user_id: z_mongodb_id,
-    name: z.string(),
-    notes: z.string(),
-}));
-collection_project.add_layers([], [new F_SM_Open_Access(collection_project)]);
-let collection_step = new F_Collection('step', 'steps', z.object({
-    _id: z_mongodb_id,
-    project_id: z_mongodb_id,
-    user_id: z_mongodb_id,
-    status: z.enum(['not started', 'started', 'done']),
-    phase: z.enum(['beginning', 'middle', 'end']),
-}));
-collection_step.add_layers([], [new F_SM_Open_Access(collection_step)]);
-let collection_analytics = new F_Collection('analytics', 'analytics', z.object({
-    _id: z_mongodb_id,
-    user_id: z_mongodb_id,
-    started_projects: z.number(),
-    finished_steps: z.number(),
-}));
-collection_analytics.add_layers([], [new F_SM_Open_Access(collection_analytics)]);
-collection_project.on_create(async (session, created_document) => {
-    for (let phase of ['beginning', 'middle', 'end']) {
-        await collection_step.mongoose_model.create([{
-                project_id: created_document._id,
-                user_id: created_document.user_id,
-                status: "not started",
-                phase: phase,
-            }], { session: session });
-    }
-});
-collection_project.after_create(async (created_document) => {
-    let analytics = await collection_analytics.mongoose_model.findOne({
-        user_id: created_document.user_id
-    }).lean();
-    if (!analytics) {
-        await collection_analytics.mongoose_model.create({
-            user_id: created_document.user_id,
-            started_projects: 1,
-            finished_steps: 0,
-        });
-    }
-    else {
-        await collection_analytics.mongoose_model.findByIdAndUpdate(analytics._id, {
-            $inc: { started_projects: 1 }
-        });
-    }
-});
-collection_step.after_update(async (updated_document) => {
-    let [finished_steps, analytics] = await Promise.all([
-        collection_step.mongoose_model.countDocuments({ user_id: updated_document.user_id, status: 'done' }),
-        collection_analytics.mongoose_model.findOne({
-            user_id: updated_document.user_id
-        }).lean()
-    ]);
-    if (!analytics) {
-        console.warn(`Something strange has happened--there weren't analytics available for the step already`);
-        let project_count = await collection_project.mongoose_model.countDocuments({ user_id: updated_document.user_id });
-        await collection_analytics.mongoose_model.findOne({
-            user_id: updated_document.user_id,
-            started_projects: project_count,
-            finished_steps: finished_steps,
-        });
-    }
-    else {
-        await collection_analytics.mongoose_model.findByIdAndUpdate(analytics._id, {
-            finished_steps: finished_steps,
-        });
-    }
-});
 let collection_registry = (new F_Collection_Registry())
     .register(collection_user)
     .register(collection_project)
