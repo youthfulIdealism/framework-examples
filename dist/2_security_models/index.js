@@ -49,6 +49,7 @@ collection_project.add_layers(['tenant', 'client'], [new Security_Model_Deny(col
 collection_project.add_layers(['tenant'], [new Security_Model_Deny(collection_project)]);
 collection_asset.add_layers(['tenant', 'client'], [new Security_Model_Low_Value_Assets(collection_asset)]);
 let collection_registry = (new F_Collection_Registry())
+    .register(collection_user)
     .register(collection_tenant)
     .register(collection_client)
     .register(collection_project)
@@ -65,6 +66,11 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_tenant.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_client.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_project.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_asset.mongoose_model.deleteMany({ _id: { $ne: null } });
 const barnaby_auth_id = uuid();
 const barnaby_auth_header = { authorization: barnaby_auth_id };
 let sample_user = await collection_user.perform_create_and_side_effects({

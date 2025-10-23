@@ -108,6 +108,7 @@ collection_project.add_layers(['tenant'], [new F_SM_Open_Access(collection_proje
 
 // set up the collection registry
 let collection_registry = (new F_Collection_Registry())
+    .register(collection_user)
     .register(collection_tenant)
     .register(collection_client)
     .register(collection_project)
@@ -127,6 +128,12 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 
 // start the express server
 let server = express_app.listen(port);
+
+// clean out the database
+await collection_user.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_tenant.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_client.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
 
 
 /*
@@ -171,7 +178,7 @@ let sample_client_3 = await collection_client.perform_create_and_side_effects({
 // create some projects
 let sample_project_1 = await collection_project.perform_create_and_side_effects({
     name: `Find apology gift`,
-    notes: `Carol didn't appreciate the PVC pipes. Find an apology gift to win her back! She's a botanist. Toilet paper is both practical and made of plants. Maybe I could get her a sampler pack of different premium toilet papers?`,
+    notes: `Carol didn't appreciate the PVC pipes. Find an apology gift to win her back! She's a botanist. Toilet paper is both practical and made of plants. Maybe I could get her one of those sampler packs of different premium toilet papers?`,
     tenant_id: sample_tenant_1._id,
     client_id: sample_client_1._id,
 });

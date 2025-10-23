@@ -31,6 +31,14 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_project.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_step.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_analytics.mongoose_model.deleteMany({ _id: { $ne: null } });
+let sample_user = await collection_user.perform_create_and_side_effects({
+    name: 'Barnaby Otterwick',
+    auth_system_id: 'barnaby_otterwick'
+});
 await rimraf('./src/5_client_libraries/client_library');
 await rimraf('./dist/5_client_libraries/client_library');
 await mkdir('./src/5_client_libraries/client_library');
@@ -54,11 +62,6 @@ await new Promise((resolve, rej) => {
         console.error(stderr);
         resolve('');
     });
-});
-collection_user.mongoose_model.deleteMany({});
-let sample_user = await collection_user.perform_create_and_side_effects({
-    name: 'Barnaby Otterwick',
-    auth_system_id: 'barnaby_otterwick'
 });
 await cp('./src/5_client_libraries/client_library', './dist/5_client_libraries/client_library', { recursive: true });
 console.log(`setup finished; feel free to run "node ./dist/5_client_libraries/index.js" in another console window`);

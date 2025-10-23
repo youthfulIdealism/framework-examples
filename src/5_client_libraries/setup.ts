@@ -59,8 +59,13 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 // start the express server
 let server = express_app.listen(port);
 
-// clean out the database and set up a sample user
-collection_user.mongoose_model.deleteMany({});
+// clean out the database
+await collection_user.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_step.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_analytics.mongoose_model.deleteMany({_id: { $ne: null}});
+
+// set up a sample user
 let sample_user = await collection_user.perform_create_and_side_effects({
     name: 'Barnaby Otterwick',
     auth_system_id: 'barnaby_otterwick'

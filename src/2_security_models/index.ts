@@ -100,6 +100,7 @@ collection_asset.add_layers(['tenant', 'client'], [new Security_Model_Low_Value_
 
 // set up the collection registry
 let collection_registry = (new F_Collection_Registry())
+    .register(collection_user)
     .register(collection_tenant)
     .register(collection_client)
     .register(collection_project)
@@ -120,6 +121,13 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 
 // start the express server
 let server = express_app.listen(port);
+
+// clean out the database
+await collection_user.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_tenant.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_client.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_asset.mongoose_model.deleteMany({_id: { $ne: null}});
 
 
 /*

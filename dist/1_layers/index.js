@@ -39,6 +39,7 @@ collection_client.add_layers(['tenant'], [new F_SM_Open_Access(collection_client
 collection_project.add_layers(['tenant', 'client'], [new F_SM_Open_Access(collection_project)]);
 collection_project.add_layers(['tenant'], [new F_SM_Open_Access(collection_project)]);
 let collection_registry = (new F_Collection_Registry())
+    .register(collection_user)
     .register(collection_tenant)
     .register(collection_client)
     .register(collection_project);
@@ -54,6 +55,10 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_tenant.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_client.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_project.mongoose_model.deleteMany({ _id: { $ne: null } });
 const barnaby_auth_id = uuid();
 const barnaby_auth_header = { authorization: barnaby_auth_id };
 let sample_user = await collection_user.perform_create_and_side_effects({
@@ -81,7 +86,7 @@ let sample_client_3 = await collection_client.perform_create_and_side_effects({
 });
 let sample_project_1 = await collection_project.perform_create_and_side_effects({
     name: `Find apology gift`,
-    notes: `Carol didn't appreciate the PVC pipes. Find an apology gift to win her back! She's a botanist. Toilet paper is both practical and made of plants. Maybe I could get her a sampler pack of different premium toilet papers?`,
+    notes: `Carol didn't appreciate the PVC pipes. Find an apology gift to win her back! She's a botanist. Toilet paper is both practical and made of plants. Maybe I could get her one of those sampler packs of different premium toilet papers?`,
     tenant_id: sample_tenant_1._id,
     client_id: sample_client_1._id,
 });

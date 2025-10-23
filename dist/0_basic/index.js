@@ -43,6 +43,8 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_todo_item.mongoose_model.deleteMany({ _id: { $ne: null } });
 const barnaby_auth_id = uuid();
 const barnaby_auth_header = { authorization: barnaby_auth_id };
 let sample_user = await collection_user.perform_create_and_side_effects({

@@ -144,6 +144,12 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 // start the express server
 let server = express_app.listen(port);
 
+// clean out the database
+await collection_user.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_tenant.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_role.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_role_membership.mongoose_model.deleteMany({_id: { $ne: null}});
 
 /*
     Demo everything

@@ -29,6 +29,10 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_project.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_step.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_analytics.mongoose_model.deleteMany({ _id: { $ne: null } });
 const barnaby_auth_id = uuid();
 const barnaby_auth_header = { authorization: barnaby_auth_id };
 let sample_user = await collection_user.perform_create_and_side_effects({
@@ -37,7 +41,6 @@ let sample_user = await collection_user.perform_create_and_side_effects({
 });
 const sample_user_id = '' + sample_user._id;
 console.log(`fetching all the existing projects, steps, and analytics, just to show that the collections are empty`);
-console.log(`If they're not empty, you may have forgotten to clear out the database :)`);
 console.log(await ky.get(`http://localhost:${port}/api/project`, {
     headers: barnaby_auth_header
 }).json());

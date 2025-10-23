@@ -53,6 +53,11 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 // start the express server
 let server = express_app.listen(port);
 
+// clean out the database
+await collection_user.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_step.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_analytics.mongoose_model.deleteMany({_id: { $ne: null}});
 
 /*
     Demo everything
@@ -68,7 +73,6 @@ let sample_user = await collection_user.perform_create_and_side_effects({
 const sample_user_id = '' + sample_user._id;
 
 console.log(`fetching all the existing projects, steps, and analytics, just to show that the collections are empty`)
-console.log(`If they're not empty, you may have forgotten to clear out the database :)`)
 console.log(await ky.get(`http://localhost:${port}/api/project`, {
     headers: barnaby_auth_header
 }).json())
