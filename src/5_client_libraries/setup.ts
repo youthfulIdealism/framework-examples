@@ -59,6 +59,13 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 // start the express server
 let server = express_app.listen(port);
 
+// clean out the database and set up a sample user
+collection_user.mongoose_model.deleteMany({});
+let sample_user = await collection_user.perform_create_and_side_effects({
+    name: 'Barnaby Otterwick',
+    auth_system_id: 'barnaby_otterwick'
+});
+
 // delete the old client library
 await rimraf('./src/5_client_libraries/client_library');
 await rimraf('./dist/5_client_libraries/client_library');
@@ -68,6 +75,8 @@ await mkdir('./src/5_client_libraries/client_library');
 await generate_client_library('./src/5_client_libraries/client_library', collection_registry);
 
 // build the client library
+
+// run npm install to fetch the client library's dependencies
 await new Promise((resolve, rej) => {
     exec('npm install', { cwd: './src/5_client_libraries/client_library/' }, (err, stdout, stderr) => {
         if (err) {
@@ -81,6 +90,7 @@ await new Promise((resolve, rej) => {
     });
 })
 
+// run npm build to compile the client library from typescript to javascript
 await new Promise((resolve, rej) => {
     exec('npm run-script build', { cwd: './src/5_client_libraries/client_library/' }, (err, stdout, stderr) => {
         if (err) {
@@ -94,13 +104,7 @@ await new Promise((resolve, rej) => {
     });
 })
 
-collection_user.mongoose_model.deleteMany({});
-
-let sample_user = await collection_user.perform_create_and_side_effects({
-    name: 'Barnaby Otterwick',
-    auth_system_id: 'barnaby_otterwick'
-});
-
+// copy the client library to the ./dist folder so that the example code can use it
 await cp('./src/5_client_libraries/client_library', './dist/5_client_libraries/client_library', {recursive: true});
 
 console.log(`setup finished; feel free to run "node ./dist/5_client_libraries/index.js" in another console window`)
