@@ -1,0 +1,24 @@
+export type analytics_query = {
+    "limit"?: number;
+    "cursor"?: string;
+    "sort_order"?: ("ascending" | "descending");
+    "_id"?: string;
+    "_id_gt"?: string;
+    "_id_lt"?: string;
+    "_id_in"?: string[];
+    "user_id"?: string;
+    "user_id_gt"?: string;
+    "user_id_lt"?: string;
+    "user_id_in"?: string[];
+    "started_projects"?: number;
+    "started_projects_gt"?: number;
+    "started_projects_gte"?: number;
+    "started_projects_lt"?: number;
+    "started_projects_lte"?: number;
+    "finished_steps"?: number;
+    "finished_steps_gt"?: number;
+    "finished_steps_gte"?: number;
+    "finished_steps_lt"?: number;
+    "finished_steps_lte"?: number;
+    "sort"?: ("_id" | "user_id" | "started_projects" | "finished_steps");
+};

@@ -1,0 +1,22 @@
+export type step_query = {
+    "limit"?: number;
+    "cursor"?: string;
+    "sort_order"?: ("ascending" | "descending");
+    "_id"?: string;
+    "_id_gt"?: string;
+    "_id_lt"?: string;
+    "_id_in"?: string[];
+    "project_id"?: string;
+    "project_id_gt"?: string;
+    "project_id_lt"?: string;
+    "project_id_in"?: string[];
+    "user_id"?: string;
+    "user_id_gt"?: string;
+    "user_id_lt"?: string;
+    "user_id_in"?: string[];
+    "status"?: ("not started" | "started" | "done");
+    "status_in"?: ("not started" | "started" | "done")[];
+    "phase"?: ("beginning" | "middle" | "end");
+    "phase_in"?: ("beginning" | "middle" | "end")[];
+    "sort"?: ("_id" | "project_id" | "user_id" | "status" | "phase");
+};
