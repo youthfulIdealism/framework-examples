@@ -4,5 +4,4 @@ export declare let collection_user: F_Collection<"user", z.ZodObject<{
     _id: z.ZodCustom<string, string>;
     name: z.ZodString;
     auth_system_id: z.ZodString;
-    is_super_admin: z.ZodBoolean;
 }, z.core.$strip>>;

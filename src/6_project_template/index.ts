@@ -12,48 +12,52 @@ let client_library = await import('./client_library/dist/index.js').catch(err =>
 });
 
 
-// the client library accepts a function that returns the string contents of the auth header. This is where you'd
-// integrate with supabase auth, firebase auth, etc on the frontend.
-let get_auth = async () => 'barnaby_otterwick'
-
-// set up the client library
+// set up the client library for the admin and for the standard user
 const port = 4601;
-let api = client_library.api(`http://localhost:${port}/api`, get_auth);
+let admin_user_api = client_library.api(`http://localhost:${port}/api`, async () => 'barnaby_otterwick');
+let standard_user_api = client_library.api(`http://localhost:${port}/api`, async () => 'carol_trussbury');
 
-// get the current user. Notice that typescript will autocomplete the fields permitted by the queries.
-console.log(`getting the current user:`)
-let users = await api.collection('user').query({auth_system_id: 'barnaby_otterwick' })
-let user = users[0];
-console.log(user);
 
-// get the projects assigned to the current user (should be empty). Notice that typescript will autocomplete
-// the users fields.
-console.log();
-console.log();
-console.log(`getting projects assigned to the current user`);
-let projects = await api.collection('project').query({user_id: user._id})
-console.log(projects)
+console.log(`As an admin, fetching the tenants the user is permitted to see:`)
+let admin_user = (await admin_user_api.collection('user').query({ auth_system_id: 'barnaby_otterwick' }))[0];
+let admin_user_role_memberships = await admin_user_api.collection('tenant_role_membership').query({user_id: admin_user._id})
+let admin_user_tenants = [];
+for(let role_membership of admin_user_role_memberships) {
+    admin_user_tenants.push(await admin_user_api.collection('tenant').document(role_membership.tenant_id).get())
+}
+console.log(admin_user_tenants);
+
 
 console.log();
 console.log();
-console.log(`creating a project`);
-let created_project = await api.collection("project").post({
-    user_id: user._id,
-    name: "Attend Carol's birthday party",
-    notes: "Carol and I reconnected during our maple trip and are better friends than ever! A happy ending for everyone. I can't wait until her next birthday--I'm planning on getting her a couple two-gallon buckets of maple syrup for her morning pancakes. What great value!"
+console.log(`As a standard user, fetching the tenants the user is permitted to see:`)
+let standard_user = (await standard_user_api.collection('user').query({ auth_system_id: 'carol_trussbury' }))[0];
+let standard_user_role_memberships = await standard_user_api.collection('tenant_role_membership').query({user_id: standard_user._id})
+let standard_user_tenants = [];
+for(let role_membership of standard_user_role_memberships) {
+    standard_user_tenants.push(await standard_user_api.collection('tenant').document(role_membership.tenant_id).get())
+}
+console.log(standard_user_tenants);
+
+
+console.log();
+console.log();
+console.log(`As an admin user, create a client and project:`)
+let standard_user_tenant = standard_user_tenants[0];
+let client_0 = await admin_user_api.collection('tenant').document(standard_user_tenant._id).collection('client').post({
+    tenant_id: standard_user_tenant._id,
+    name: "sample client"
 })
-console.log(created_project);
-
-console.log();
-console.log();
-console.log('fetching a specific project');
-let fetched_project = await api.collection("project").document(created_project._id).get()
-console.log(fetched_project);
-
-console.log();
-console.log();
-console.log('updating a specific project');
-let updated_project = await api.collection("project").document(created_project._id).put({
-    name: "Attend Carol's next birthday party",
+let project_0 = await admin_user_api.collection('tenant').document(standard_user_tenant._id).collection('client').document(client_0._id).collection('project').post({
+    assignees: [standard_user._id],
+    client_id: client_0._id,
+    name: 'sample project 0',
+    notes: 'created by the admin',
+    tenant_id: client_0.tenant_id,
 })
-console.log(updated_project);
+console.log(client_0)
+console.log(project_0)
+
+console.log();
+console.log();
+console.log(`As a standard user, fetch the clients and projects`)
