@@ -63,6 +63,7 @@ let collection_role = new F_Collection('role', 'roles', z.object({
 
 // define a collection for the role memberships
 let collection_role_membership = new F_Collection('role_membership', 'role_memberships', z.object({
+    _id: z_mongodb_id,
     tenant_id: z_mongodb_id,
     user_id: z_mongodb_id,
     role_id: z_mongodb_id,

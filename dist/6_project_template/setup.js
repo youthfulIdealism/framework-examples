@@ -40,6 +40,55 @@ F_Security_Model.set_auth_fetcher(async (req) => {
     return { user_id: user_record._id + '', layers: [] };
 });
 let server = express_app.listen(port);
+await collection_client_role_membership.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_client.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_project.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_role.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_tenant.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_tenant_role_membership.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_user.mongoose_model.deleteMany({ _id: { $ne: null } });
+await collection_user_profile.mongoose_model.deleteMany({ _id: { $ne: null } });
+let tenant_0 = await collection_tenant.perform_create_and_side_effects({
+    name: 'Watermelon Disposal Corporation'
+});
+let tenant_0_role_admin = await collection_role.mongoose_model.findOne({
+    tenant_id: tenant_0._id,
+    name: 'admin'
+});
+let tenant_0_role_standard = await collection_role.mongoose_model.findOne({
+    tenant_id: tenant_0._id,
+    name: 'standard'
+});
+let tenant_1 = await collection_tenant.perform_create_and_side_effects({
+    name: 'Walrus Fungus Institute'
+});
+let tenant_1_role_admin = await collection_role.mongoose_model.findOne({
+    tenant_id: tenant_1._id,
+    name: 'admin'
+});
+let sample_admin = await collection_user.perform_create_and_side_effects({
+    name: 'Barnaby Otterwick',
+    auth_system_id: 'barnaby_otterwick'
+});
+let sample_admin_role_membership_tenant_0 = await collection_tenant_role_membership.perform_create_and_side_effects({
+    tenant_id: tenant_0._id,
+    user_id: sample_admin._id,
+    role_id: tenant_0_role_admin._id
+});
+let sample_admin_role_membership_tenant_1 = await collection_tenant_role_membership.perform_create_and_side_effects({
+    tenant_id: tenant_1._id,
+    user_id: sample_admin._id,
+    role_id: tenant_1_role_admin._id
+});
+let sample_standard_user = await collection_user.perform_create_and_side_effects({
+    name: 'Carol Trussbury',
+    auth_system_id: 'carol_trussbury'
+});
+let sample_standard_user_role_membership = await collection_tenant_role_membership.perform_create_and_side_effects({
+    tenant_id: tenant_1._id,
+    user_id: sample_standard_user._id,
+    role_id: tenant_0_role_admin._id
+});
 await rimraf('./src/6_project_template/client_library');
 await rimraf('./dist/6_project_template/client_library');
 await mkdir('./src/6_project_template/client_library');

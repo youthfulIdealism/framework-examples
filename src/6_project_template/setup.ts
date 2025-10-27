@@ -63,7 +63,7 @@ F_Security_Model.set_auth_fetcher(async (req: Request) => {
 let server = express_app.listen(port);
 
 // clean out the database
-/*await collection_client_role_membership.mongoose_model.deleteMany({_id: { $ne: null}});
+await collection_client_role_membership.mongoose_model.deleteMany({_id: { $ne: null}});
 await collection_client.mongoose_model.deleteMany({_id: { $ne: null}});
 await collection_project.mongoose_model.deleteMany({_id: { $ne: null}});
 await collection_role.mongoose_model.deleteMany({_id: { $ne: null}});
@@ -121,7 +121,7 @@ let sample_standard_user_role_membership = await collection_tenant_role_membersh
     tenant_id: tenant_1._id,
     user_id: sample_standard_user._id,
     role_id: tenant_0_role_admin._id
-});*/
+});
 
 
 // delete the old client library

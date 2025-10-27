@@ -40,5 +40,8 @@ let project_0 = await admin_user_api.collection('tenant').document(standard_user
 });
 console.log(client_0);
 console.log(project_0);
+console.log();
+console.log();
+console.log(`As a standard user, fetch the clients and projects`);
 export {};
 //# sourceMappingURL=index.js.map

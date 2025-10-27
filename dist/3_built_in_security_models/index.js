@@ -30,6 +30,7 @@ let collection_role = new F_Collection('role', 'roles', z.object({
     permissions: z.record(z.string(), z.array(z.enum(['read', 'create', 'update', 'delete']))),
 }));
 let collection_role_membership = new F_Collection('role_membership', 'role_memberships', z.object({
+    _id: z_mongodb_id,
     tenant_id: z_mongodb_id,
     user_id: z_mongodb_id,
     role_id: z_mongodb_id,

@@ -39,6 +39,7 @@ export function add_standard_security<Collection_ID extends string, ZodSchema ex
         get_sm_role_membership(collection)
     ]);
     collection.add_layers(['tenant', 'client'], [
+        get_sm_role_membership(collection),
         get_sm_client_role_membership(collection)
     ]);
 }
