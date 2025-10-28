@@ -10,6 +10,10 @@ import { generate_client_library } from '@liminalfunctions/framework/generate_cl
 import { rimraf } from 'rimraf';
 import { cp, mkdir } from 'node:fs/promises';
 import { exec } from 'node:child_process';
+
+
+console.log('aksdhfja;lskjhdfas;oudfhaslo;df')
+
 const port = 4601;
 let express_app = express();
 express_app.use(express.json());
