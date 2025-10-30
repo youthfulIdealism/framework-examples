@@ -10,7 +10,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@liminalfunctions/framework": "^1.0.48",
+    "@liminalfunctions/framework": "^1.0.49",
     "@types/node": "^24.9.1",
     "express": "^5.1.0",
     "ky": "^1.12.0",
